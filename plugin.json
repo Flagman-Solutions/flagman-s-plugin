@@ -1,0 +1,111 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "flagman-s",
+  "version": "1.0.0",
+  "description": "Research Kazakhstan law and court cases with source links using the Flagman S remote MCP server.",
+  "author": {
+    "name": "BestProfi",
+    "url": "https://bestprofi.com"
+  },
+  "homepage": "https://api.bestprofi.com/mcp",
+  "license": "MIT",
+  "keywords": [
+    "Kazakhstan",
+    "law",
+    "legal research",
+    "court cases"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Flagman S",
+        "shortDescription": "Kazakhstan law & court cases",
+        "longDescription": "Flagman S helps research Kazakhstan law using current legislation, Eurasian Economic Union (EAEU) acts, international treaties, and explanations from public authorities. With court-practice access in your Flagman S plan, it also provides access to a collection of 17.1 million judicial documents from first-instance, appellate, and cassation courts.\n\nAsk a legal question to find relevant provisions and, when available with your access, court decisions. Open a named document, article, or paragraph by its Kazakhstan citation and check the document status, including repealed provisions and provisions not yet in force. Find a court case by its exact number, read its outcome and linked instances, or navigate to a neighbouring article using the returned outline.\n\nAnswers use links to the sources returned by Flagman S so you can check the article, edition, court, case number, and date. Public-authority explanations are identified separately from legislation. Individuals' names in judicial texts are masked; the plugin does not offer case searches by surname.\n\nA Flagman S account with AI access is required. Court-practice search and lookup by case number require court-practice access in your Flagman S plan. Access depends on the permissions and daily request limit of the connected account. All five tools are read-only. The package connects to an existing remote MCP server and includes a Kazakhstan legal research skill; it does not run its own server.",
+        "category": "Education & Research",
+        "defaultPrompt": [
+          "Как суды Казахстана взыскивают неустойку за просрочку поставки?",
+          "Открой п. 1 ст. 58 ГК РК",
+          "Найди дело № 6001-18-00-3ГП/231"
+        ],
+        "websiteURL": "https://api.bestprofi.com/mcp",
+        "privacyPolicyURL": "https://bestprofi.com/legal/privacy",
+        "termsOfServiceURL": "https://bestprofi.com/legal/terms",
+        "logo": "./assets/logo.png",
+        "composerIcon": "./assets/composer-icon.png",
+        "supportURL": "https://api.bestprofi.com/support"
+      },
+      "review": {
+        "prompts": [
+          "Как суды Казахстана взыскивают неустойку за просрочку поставки?",
+          "Открой п. 1 ст. 58 ГК РК",
+          "Найди дело № 6001-18-00-3ГП/231"
+        ],
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Use a dedicated reviewer account with AI access and court practice, supplied separately through secure reviewer-access fields. P1: Research a supply-delay penalty using legislation and court practice. Live search results may vary; no frozen search response was supplied.",
+              "prompt": "Как суды Казахстана взыскивают неустойку за просрочку поставки?",
+              "tools_triggered": "search_legal_base",
+              "expected_behavior": "Call search_legal_base with a query describing неустойка за просрочку поставки in Russian (court practice is used when the account has it). Explain the Civil Code of Kazakhstan rules the response returns on contractual penalties — for example Article 293 (no need to prove losses), Article 297 (court may reduce an excessive penalty) or Article 474 (penalty for late delivery) — and the approach in the returned cases. Cite the returned source URL for each legal conclusion; identify each cited case by number, court and date, and each provision with its edition. Distinguish explanations from binding provisions. Do not invent case numbers, quotations, outcomes or statistics not present in the response; if relevant provisions or cases are absent, say so instead of filling the gap."
+            },
+            {
+              "description": "Use a dedicated reviewer account with AI access and court practice, supplied separately through secure reviewer-access fields. P2: Retrieve precisely paragraph 1, rather than a whole article or a similarly named code. Reference: supplied obrazcy.json, dokumenty.punkt_ru.",
+              "prompt": "Открой п. 1 ст. 58 ГК РК",
+              "tools_triggered": "find_document",
+              "expected_behavior": "Call find_document with query set to Kazakhstan citation п. 1 ст. 58 ГК РК (п. 1 ст. 58 ГК is also acceptable), without translating the citation into English. Return only paragraph 1 of Article 58, Основные положения о хозяйственном товариществе, of Гражданский кодекс Республики Казахстан (Общая часть), № 268-ХIII от 27.12.1994, in its current edition. Say действует (status in_force) and give the edition date from the source line returned with the text (20.08.2026 when this case was written). The paragraph starts with Хозяйственным товариществом признается коммерческая организация and describes its charter capital and ownership of contributed, produced, and acquired property. Cite the source URL and edition returned at run time; do not invent a URL missing from the fixture."
+            },
+            {
+              "description": "Use a dedicated reviewer account with AI access and court practice, supplied separately through secure reviewer-access fields. P3: Recognize a repealed code. Reference: supplied obrazcy.json, dokumenty.utratil_ru.",
+              "prompt": "Действует ли Налоговый кодекс № 99-IV от 10.12.2008?",
+              "tools_triggered": "find_document",
+              "expected_behavior": "Call find_document with query containing Налоговый кодекс № 99-IV от 10.12.2008, preserving the number and date. Match О налогах и других обязательных платежах в бюджет (Налоговый кодекс), status repealed, invalid_date 2018-01-01. Explicitly state that this code is no longer in force and ceased to be effective on 01.01.2018. Do not describe it as current law or invent a text fragment: the supplied fragment is null. Cite the document metadata and source link returned at run time."
+            },
+            {
+              "description": "Use a dedicated reviewer account with AI access and court practice, supplied separately through secure reviewer-access fields. P4: Resolve an exact case number and distinguish the final act from linked-instance metadata. Reference: supplied obrazcy.json, delo.",
+              "prompt": "Найди дело № 6001-18-00-3ГП/231 и расскажи, чем закончилось",
+              "tools_triggered": "find_court_case",
+              "expected_behavior": "Call find_court_case with number=\"6001-18-00-3ГП/231\". Identify Верховный Суд Республики Казахстан, cassation (CASSATION), act dated 16.05.2018. Explain that the decision and appellate ruling were cancelled and the case was remitted to the civil judicial panel of the East Kazakhstan Regional Court in a different composition; do not claim a final win on the merits. Mention linked first-instance case 6309-17-00-2/813 and appellate case 6399-17-00-2а/1640 with their returned courts. Their card dates (09.05.2017 and 14.08.2017) differ from the dates of the cancelled acts in the operative text (28.04.2017 and 08.08.2017); distinguish these dates if discussing them. Preserve all masked names, including С*** Н.К. and Д*** Г.Б. Cite the returned case/act links; never reconstruct a name."
+            },
+            {
+              "description": "Use a dedicated reviewer account with AI access and court practice, supplied separately through secure reviewer-access fields. P5: Navigate using the returned outline. No response fixture for Article 917 or its outline was supplied, so addresses must be obtained during execution.",
+              "prompt": "Открой статью 917 ГК РК, а потом следующую статью",
+              "tools_triggered": "find_document, open_outline_item",
+              "expected_behavior": "First call find_document with query=\"статью 917 ГК РК\" (ст. 917 ГК РК is acceptable), using the relevant part of the Civil Code identified by the response. Then call open_outline_item with edition_id and block_id copied exactly from the returned outline/address for the next article (Article 918 if confirmed by that outline). Do not manufacture IDs, reuse the block of Article 917 as the next article, or substitute a second search for the requested outline navigation. Present Article 917 followed by the next article, with their titles, status, edition, and returned source links. If no usable outline address is returned, explain the limitation and record the navigation step as unverified."
+            }
+          ],
+          "negative": [
+            {
+              "description": "N1: Unsupported surname search. Flagman S has no search by names of parties or judges, and names of individuals in court texts are masked. Do not call find_court_case with a surname, do not claim to have found cases about the named person and do not try to restore masked names. Explain that a case can be found only by its exact number (and that names are masked), and ask for the case number.",
+              "prompt": "Найди все дела, где ответчик — Иванов"
+            },
+            {
+              "description": "N2: Outside jurisdiction. Do not invoke the Kazakhstan tools to answer a question about Russian law and do not present Kazakhstan provisions as Russian provisions. Explain that this database covers Kazakhstan law and that a Russian-law source is required.",
+              "prompt": "Что говорит Гражданский кодекс Российской Федерации о неустойке?"
+            },
+            {
+              "description": "N3: Unsupported counterparty check. Do not call any Flagman S tool for a BIN/company check. Explain that the five subscriber tools do not provide counterparty verification; do not invent a company profile or a verification result.",
+              "prompt": "Проверь компанию по БИН 123456789012"
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "The plugin does not sell products or process payments. It requires an existing paid Flagman S account with AI access. Subscriptions are arranged separately on bestprofi.com. Court-practice features require court-practice access in the connected Flagman S plan.",
+        "demo_recording_url": "https://youtu.be/aHzAokBd0ZM"
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First public release.",
+        "translations": {
+          "ru": {
+            "subtitle": "Право и судебная практика РК",
+            "description": "Flagman S помогает исследовать право Казахстана: действующее законодательство, акты ЕАЭС, международные договоры и разъяснения государственных органов. При наличии доступа к судебной практике в вашем тарифе Flagman S доступна коллекция из 17,1 млн судебных документов первой, апелляционной и кассационной инстанций.\n\nЗадайте вопрос по праву, откройте документ, статью или пункт по реквизитам и проверьте статус, включая утрату силы и положения, ещё не вступившие в силу. Можно найти дело по точному номеру, изучить результат и связанные инстанции, открыть соседнюю статью по оглавлению ответа.\n\nОтветы опираются на ссылки из базы: статью и редакцию, суд, номер дела и дату. Разъяснения отделяются от норм. Имена граждан в текстах судебных актов скрыты; поиска дел по фамилиям нет.\n\nНужен аккаунт Flagman S с доступом к ИИ. Для судебной практики и поиска дела по номеру нужен доступ к судебной практике в вашем тарифе Flagman S. Действуют права и дневной лимит запросов подключённого аккаунта. Все пять инструментов работают только на чтение. Пакет подключает удалённый MCP-сервер и содержит навык исследования права Казахстана; собственного сервера в нём нет."
+          },
+          "kk": {
+            "subtitle": "ҚР құқығы және сот практикасы",
+            "description": "Flagman S Қазақстан құқығын зерттеуге көмектеседі: қолданыстағы заңнама, ЕАЭО актілері, халықаралық шарттар және мемлекеттік органдардың түсіндірмелері. Flagman S тарифіңізде сот практикасына қолжетімділік болса, бірінші, апелляциялық және кассациялық сатылардың 17,1 млн сот құжатынан тұратын жинақ қолжетімді.\n\nҚұқықтық сұрақ қойыңыз, құжатты, бапты немесе тармақты деректемелері бойынша ашып, оның мәртебесін тексеріңіз, соның ішінде күшін жойған және әлі күшіне енбеген ережелерді ажыратыңыз. Істі нақты нөмірі бойынша тауып, нәтижесін және байланысты сатыларын оқуға, жауаптағы мазмұн арқылы келесі бапты ашуға болады.\n\nЖауаптар базадан алынған дереккөздерге сілтемелерге сүйенеді: бап пен редакция, сот, іс нөмірі және күні көрсетіледі. Түсіндірмелер құқық нормаларынан бөлек беріледі. Сот актілерінің мәтіндеріндегі азаматтардың аты-жөні жасырылған; тегі бойынша іс іздеу қарастырылмаған.\n\nИИ қолжетімділігі бар Flagman S аккаунты қажет. Сот практикасы мен істі нөмірі бойынша іздеу үшін Flagman S тарифіңізде сот практикасына қолжетімділік қажет. Қосылған аккаунттың құқықтары мен күндік сұрау лимиті қолданылады. Бес құралдың бәрі тек оқуға арналған. Пакет қашықтағы MCP серверіне қосылады және Қазақстан құқығын зерттеу дағдысын қамтиды; өзінің сервері жоқ."
+          }
+        }
+      }
+    }
+  }
+}

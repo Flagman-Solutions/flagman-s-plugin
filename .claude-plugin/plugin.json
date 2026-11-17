@@ -1,0 +1,17 @@
+{
+  "name": "flagman-s",
+  "version": "1.0.0",
+  "description": "Research Kazakhstan law and court cases with source links using the Flagman S remote MCP server.",
+  "author": {
+    "name": "BestProfi",
+    "url": "https://bestprofi.com"
+  },
+  "homepage": "https://api.bestprofi.com/mcp",
+  "license": "MIT",
+  "keywords": [
+    "Kazakhstan",
+    "law",
+    "legal research",
+    "court cases"
+  ]
+}

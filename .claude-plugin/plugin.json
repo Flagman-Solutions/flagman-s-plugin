@@ -13,5 +13,12 @@
     "law",
     "legal research",
     "court cases"
-  ]
+  ],
+  "displayName": "Flagman S",
+  "icon": "./assets/logo.png",
+  "repository": "https://github.com/Flagman-Solutions/flagman-s-plugin",
+  "documentationUrl": "https://api.bestprofi.com/mcp",
+  "supportUrl": "https://api.bestprofi.com/support",
+  "privacyPolicyUrl": "https://bestprofi.com/legal/privacy",
+  "termsOfServiceUrl": "https://bestprofi.com/legal/terms"
 }
